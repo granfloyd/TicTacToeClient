@@ -3,6 +3,7 @@ using UnityEngine.Assertions;
 using Unity.Collections;
 using Unity.Networking.Transport;
 using System.Text;
+using UnityEngine.UI;
 
 public class NetworkClient : MonoBehaviour
 {
@@ -11,7 +12,7 @@ public class NetworkClient : MonoBehaviour
     NetworkPipeline reliableAndInOrderPipeline;
     NetworkPipeline nonReliableNotInOrderedPipeline;
     const ushort NetworkPort = 9001;
-    const string IPAddress = "192.168.2.20";
+    const string IPAddress = "10.0.0.153";
 
     void Start()
     {
@@ -100,7 +101,28 @@ public class NetworkClient : MonoBehaviour
     private void ProcessReceivedMsg(string msg)
     {
         Debug.Log("Msg received = " + msg);
+
+        // Split the message by comma
+        string[] msgParts = msg.Split(',');
+
+        // Check if it's a MOVE command
+        if (msgParts[0] == "MOVE")
+        {
+            // Get the button name and the new text from the message
+            string buttonName = msgParts[1];
+            string newText = msgParts[2];
+
+            // Find the button by name
+            Button button = GameObject.Find(buttonName).GetComponent<Button>();
+
+            // Find the Text component of the button
+            Text buttonText = button.GetComponentInChildren<Text>();
+
+            // Update the text
+            buttonText.text = newText;
+        }
     }
+
 
     public void SendMessageToServer(string msg)
     {
