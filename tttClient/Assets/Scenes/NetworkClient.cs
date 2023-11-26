@@ -112,16 +112,19 @@ public class NetworkClient : MonoBehaviour
             string buttonName = msgParts[1];
             string newText = msgParts[2];
 
-            // Find the button by name
-            Button button = GameObject.Find(buttonName).GetComponent<Button>();
-
-            // Find the Text component of the button
-            Text buttonText = button.GetComponentInChildren<Text>();
+            // Find the Text component by name
+            Text buttonText = GameObject.Find(buttonName).GetComponent<Text>();
+            if (buttonText == null)
+            {
+                Debug.LogError("Text not found: " + buttonName);
+                return;
+            }
 
             // Update the text
             buttonText.text = newText;
         }
     }
+
 
 
     public void SendMessageToServer(string msg)
