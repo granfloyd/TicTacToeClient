@@ -13,9 +13,11 @@ public class NetworkClient : MonoBehaviour
     NetworkPipeline nonReliableNotInOrderedPipeline;
     const ushort NetworkPort = 9001;
     const string IPAddress = "10.0.0.153";
-
+    public Game gameRef;
     void Start()
     {
+        gameRef = GameObject.Find("Cube").GetComponent<Game>();
+
         networkDriver = NetworkDriver.Create();
         reliableAndInOrderPipeline = networkDriver.CreatePipeline(typeof(FragmentationPipelineStage), typeof(ReliableSequencedPipelineStage));
         nonReliableNotInOrderedPipeline = networkDriver.CreatePipeline(typeof(FragmentationPipelineStage));
@@ -101,6 +103,13 @@ public class NetworkClient : MonoBehaviour
     private void ProcessReceivedMsg(string msg)
     {
         Debug.Log("Msg received = " + msg);
+
+        // If the server sends a "YOUR_TURN" message, it's this client's turn
+        if (msg == "YOUR_TURN")
+        {
+            gameRef.isMyTurn = true;
+            return;
+        }
 
         // Split the message by comma
         string[] msgParts = msg.Split(',');
