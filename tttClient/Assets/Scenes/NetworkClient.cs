@@ -15,7 +15,6 @@ public class NetworkClient : MonoBehaviour
     const ushort NetworkPort = 9001;
     const string IPAddress = "10.0.0.153";
     public Game gameRef;
-
     void Start()
     {
         gameRef = GameObject.Find("Cube").GetComponent<Game>();
@@ -137,9 +136,10 @@ public class NetworkClient : MonoBehaviour
         }
         if (msg.StartsWith("RESET"))
         {
-           SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
-           string doneMsg = "RESET_COMPLETE";
-           SendMessageToServer(doneMsg);
+            string doneMsg = "RESET_COMPLETE";
+            gameRef.ResetGame();
+            SendMessageToServer(doneMsg);
+            
         }
     }
 

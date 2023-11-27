@@ -2097,6 +2097,51 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1284627880
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1284627882}
+  - component: {fileID: 1284627881}
+  m_Layer: 0
+  m_Name: important
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1284627881
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1284627880}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 660c57f5ebf08fa4aa4cf86481ee75cd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gameRef: {fileID: 0}
+--- !u!4 &1284627882
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1284627880}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 544.615, y: 490.6021, z: -194.62778}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 5
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1390898268
 GameObject:
   m_ObjectHideFlags: 0
@@ -2826,7 +2871,6 @@ GameObject:
   - component: {fileID: 1942158118}
   - component: {fileID: 1942158117}
   - component: {fileID: 1942158116}
-  - component: {fileID: 1942158115}
   - component: {fileID: 1942158120}
   m_Layer: 0
   m_Name: Cube
@@ -2835,19 +2879,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1942158115
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1942158114}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 660c57f5ebf08fa4aa4cf86481ee75cd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  gameRef: {fileID: 0}
 --- !u!65 &1942158116
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -2938,7 +2969,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b89f08531c21a6045bce30054f0d601d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  clientRef: {fileID: 1942158115}
+  clientRef: {fileID: 0}
   x1y1: {fileID: 1273331292}
   x2y1: {fileID: 432840307}
   x3y1: {fileID: 77457253}
@@ -2957,4 +2988,6 @@ MonoBehaviour:
   txtx1y3: {fileID: 1822335784}
   txtx2y3: {fileID: 377247152}
   txtx3y3: {fileID: 1675020190}
+  input: 0
   isMyTurn: 0
+  isWinConditionMet: 0
