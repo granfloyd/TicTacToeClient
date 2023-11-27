@@ -4,6 +4,7 @@ using Unity.Collections;
 using Unity.Networking.Transport;
 using System.Text;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class NetworkClient : MonoBehaviour
 {
@@ -133,6 +134,12 @@ public class NetworkClient : MonoBehaviour
             }
 
             buttonText.text = newText;
+        }
+        if (msg.StartsWith("RESET"))
+        {
+           SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+           string doneMsg = "RESET_COMPLETE";
+           SendMessageToServer(doneMsg);
         }
     }
 

@@ -30,6 +30,7 @@ public class Game : MonoBehaviour
     public Text txtx2y3;
     public Text txtx3y3;
 
+    public int input = 0;
     public bool isMyTurn = false;
 
     // Start is called before the first frame update
@@ -63,6 +64,8 @@ public class Game : MonoBehaviour
         // After making a move, it's no longer this client's turn
         isMyTurn = false;
 
+        input += 1;
+
         
     }
     bool CheckWinCondition()
@@ -94,12 +97,16 @@ public class Game : MonoBehaviour
         if (CheckWinCondition())
         {
             Debug.Log("Game Over! We have a winner!");
-            StartCoroutine(ReloadSceneAfterDelay(5));
+            string winnerMsg = "WINNER";
+            clientRef.SendMessageToServer(winnerMsg);
+        }
+        else if(input == 5)
+        {
+            string loserMsg = "LOSER";
+            clientRef.SendMessageToServer(loserMsg);
+            Debug.Log("Draw!");
         }
     }
-    IEnumerator ReloadSceneAfterDelay(int seconds)
-    {
-        yield return new WaitForSeconds(seconds);
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
-    }
+
+
 }
