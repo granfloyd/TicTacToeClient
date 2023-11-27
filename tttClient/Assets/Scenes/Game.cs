@@ -4,6 +4,7 @@ using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class Game : MonoBehaviour
 {
@@ -61,10 +62,44 @@ public class Game : MonoBehaviour
 
         // After making a move, it's no longer this client's turn
         isMyTurn = false;
+
+        
+    }
+    bool CheckWinCondition()
+    {
+        // Check rows
+        if (CheckThree(txtx1y1.text, txtx2y1.text, txtx3y1.text)) return true;
+        if (CheckThree(txtx1y2.text, txtx2y2.text, txtx3y2.text)) return true;
+        if (CheckThree(txtx1y3.text, txtx2y3.text, txtx3y3.text)) return true;
+
+        // Check columns
+        if (CheckThree(txtx1y1.text, txtx1y2.text, txtx1y3.text)) return true;
+        if (CheckThree(txtx2y1.text, txtx2y2.text, txtx2y3.text)) return true;
+        if (CheckThree(txtx3y1.text, txtx3y2.text, txtx3y3.text)) return true;
+
+        // Check diagonals
+        if (CheckThree(txtx1y1.text, txtx2y2.text, txtx3y3.text)) return true;
+        if (CheckThree(txtx1y3.text, txtx2y2.text, txtx3y1.text)) return true;
+
+        return false;
+    }
+    bool CheckThree(string a, string b, string c)
+    {
+        return !string.IsNullOrEmpty(a) && a == b && b == c;
     }
     // Update is called once per frame
     void Update()
     {
-        
+        // Check for a win condition after each move
+        if (CheckWinCondition())
+        {
+            Debug.Log("Game Over! We have a winner!");
+            StartCoroutine(ReloadSceneAfterDelay(5));
+        }
+    }
+    IEnumerator ReloadSceneAfterDelay(int seconds)
+    {
+        yield return new WaitForSeconds(seconds);
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 }
