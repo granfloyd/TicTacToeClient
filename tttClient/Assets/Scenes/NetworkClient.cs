@@ -104,17 +104,16 @@ public class NetworkClient : MonoBehaviour
     {
         Debug.Log("Msg received = " + msg);
 
-        // If the server sends a "YOUR_TURN" message, it's this client's turn
-        if (msg.StartsWith("YOUR_TURN"))
-        {
-            gameRef.isMyTurn = true;
-            return;
-        }
-
         // If the server sends a "MOVE" message, update the button text
         if (msg.StartsWith("MOVE"))
         {
             string[] msgParts = msg.Split(',');
+            if (msgParts.Length < 3)
+            {
+                Debug.LogError("Invalid MOVE message: " + msg);
+                return;
+            }
+
             string buttonName = msgParts[1];
             string newText = msgParts[2];
 
