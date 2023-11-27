@@ -105,23 +105,19 @@ public class NetworkClient : MonoBehaviour
         Debug.Log("Msg received = " + msg);
 
         // If the server sends a "YOUR_TURN" message, it's this client's turn
-        if (msg == "YOUR_TURN")
+        if (msg.StartsWith("YOUR_TURN"))
         {
             gameRef.isMyTurn = true;
             return;
         }
 
-        // Split the message by comma
-        string[] msgParts = msg.Split(',');
-
-        // Check if it's a MOVE command
-        if (msgParts[0] == "MOVE")
+        // If the server sends a "MOVE" message, update the button text
+        if (msg.StartsWith("MOVE"))
         {
-            // Get the button name and the new text from the message
+            string[] msgParts = msg.Split(',');
             string buttonName = msgParts[1];
             string newText = msgParts[2];
 
-            // Find the Text component by name
             Text buttonText = GameObject.Find(buttonName).GetComponent<Text>();
             if (buttonText == null)
             {
@@ -129,10 +125,10 @@ public class NetworkClient : MonoBehaviour
                 return;
             }
 
-            // Update the text
             buttonText.text = newText;
         }
     }
+
 
 
 
