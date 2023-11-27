@@ -28,9 +28,6 @@ public class Game : MonoBehaviour
     public Text txtx1y3;
     public Text txtx2y3;
     public Text txtx3y3;
-    public char x = 'x';
-    public char o = 'o';
-    public int input = 1;
 
     public bool isMyTurn = false;
 
@@ -65,8 +62,6 @@ public class Game : MonoBehaviour
         // After making a move, it's no longer this client's turn
         isMyTurn = false;
     }
-
-
     // Update is called once per frame
     void Update()
     {

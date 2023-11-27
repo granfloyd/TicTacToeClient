@@ -14,6 +14,7 @@ public class NetworkClient : MonoBehaviour
     const ushort NetworkPort = 9001;
     const string IPAddress = "10.0.0.153";
     public Game gameRef;
+
     void Start()
     {
         gameRef = GameObject.Find("Cube").GetComponent<Game>();
@@ -134,9 +135,6 @@ public class NetworkClient : MonoBehaviour
             buttonText.text = newText;
         }
     }
-
-
-
 
 
     public void SendMessageToServer(string msg)
