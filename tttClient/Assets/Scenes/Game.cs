@@ -68,17 +68,7 @@ public class Game : MonoBehaviour
         isMyTurn = false;
 
         input += 1;
-        // Check for a win condition after each move
-        if (CheckWinCondition())
-        {
-            Debug.Log("Game Over! We have a winner!");
-            string winnerMsg = "WINNER";
-            clientRef.SendMessageToServer(winnerMsg);
-
-            ResetGame();
-
-        }
-        else if (input == 5)
+        if (input == 5)
         {
             string loserMsg = "LOSER";
             clientRef.SendMessageToServer(loserMsg);
@@ -103,6 +93,7 @@ public class Game : MonoBehaviour
         // Check diagonals
         if (CheckThree(txtx1y1.text, txtx2y2.text, txtx3y3.text)) return SetWinCondition(true);
         if (CheckThree(txtx1y3.text, txtx2y2.text, txtx3y1.text)) return SetWinCondition(true);
+   
         return false;
     }
 
@@ -140,8 +131,19 @@ public class Game : MonoBehaviour
         ResetTxt();
         input = 0;
         isWinConditionMet = false;
+        isMyTurn = false;
     }
+    private void Update()
+    {
+        if(CheckWinCondition())
+        {
+            Debug.Log("Game Over! We have a winner!");
+            string winnerMsg = "WINNER";
+            clientRef.SendMessageToServer(winnerMsg);
 
+            ResetGame();
+        }
+    }
 
 
 }
