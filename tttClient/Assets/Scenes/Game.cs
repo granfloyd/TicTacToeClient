@@ -53,38 +53,19 @@ public class Game : MonoBehaviour
         x3y3.onClick.AddListener(() => AddInput(txtx3y3));
     }
 
-    public bool IsEven(int num)
-    {
-        return num % 2 == 0;
-    }
-    public bool IsOdd(int num)
-    {
-        return num % 2 != 0;
-    }
     public void AddInput(Text txt)
     {
         // If it's not this client's turn, don't do anything
         if (!isMyTurn)
             return;
 
-        string msg;
-        if (IsOdd(input))
-        {
-            txt.text = x.ToString();
-            msg = $"MOVE,{txt.name},{x}";
-            input += 1;
-        }
-        else
-        {
-            txt.text = o.ToString();
-            msg = $"MOVE,{txt.name},{o}";
-            input += 1;
-        }
+        string msg = $"MOVE,{txt.name}";
         clientRef.SendMessageToServer(msg);
+
         // After making a move, it's no longer this client's turn
         isMyTurn = false;
-
     }
+
 
     // Update is called once per frame
     void Update()
