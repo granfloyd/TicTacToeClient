@@ -27,6 +27,8 @@ public class Other : MonoBehaviour
     public Text createusernametxt;
     public Text createpasswordtxt;
 
+    public Text displayusernametxt;
+
     public string currentUsername;
     public string currentPassword;
 

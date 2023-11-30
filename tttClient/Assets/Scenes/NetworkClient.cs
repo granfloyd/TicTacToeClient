@@ -42,13 +42,13 @@ public class NetworkClient : MonoBehaviour
         //create account
         if(otherRef.sendit)
         {
-            SendMessageToServer("MAKE_ACCOUNT" + "," + otherRef.currentUsername + "," + otherRef.currentPassword);
+            SendMessageToServer("MAKE_ACCOUNT" + "," + otherRef.currentUsername + "," + otherRef.currentPassword, TransportPipeline.ReliableAndInOrder);
             otherRef.sendit = false;
         }
         //sigin in
         if (otherRef.senditt)
         {
-            SendMessageToServer("CREATE_ACCOUNT" + "," + otherRef.currentUsername + "," + otherRef.currentPassword);
+            SendMessageToServer("LOGIN_DATA" + "," + otherRef.currentUsername + "," + otherRef.currentPassword ,TransportPipeline.ReliableAndInOrder);
             otherRef.senditt = false;
         }
 
@@ -122,11 +122,16 @@ public class NetworkClient : MonoBehaviour
     private void ProcessReceivedMsg(string msg)
     {
         Debug.Log("Msg received = " + msg);
-
-        // If the server sends a "YOUR_TURN" message, it's this client's turn
         if (msg.StartsWith("YOUR_TURN"))
         {
             gameRef.isMyTurn = true;
+            return;
+        }
+        // If the server sends a "YOUR_TURN" message, it's this client's turn
+        if (msg.StartsWith("LOGIN_SUCCESSFUL"))
+        {
+            string[] msgParts = msg.Split(',');
+            otherRef.displayusernametxt.text = msgParts[1];
             return;
         }
 
@@ -160,7 +165,26 @@ public class NetworkClient : MonoBehaviour
             
         }
     }
+    public void Connect()
+    {
+        networkDriver = NetworkDriver.Create();
+        reliableAndInOrderPipeline = networkDriver.CreatePipeline(typeof(FragmentationPipelineStage), typeof(ReliableSequencedPipelineStage));
+        nonReliableNotInOrderedPipeline = networkDriver.CreatePipeline(typeof(FragmentationPipelineStage));
+        networkConnection = default(NetworkConnection);
+        NetworkEndPoint endpoint = NetworkEndPoint.Parse(IPAddress, NetworkPort, NetworkFamily.Ipv4);
+        networkConnection = networkDriver.Connect(endpoint);
+    }
 
+    public bool IsConnected()
+    {
+        return networkConnection.IsCreated;
+    }
+
+    public void Disconnect()
+    {
+        networkConnection.Disconnect(networkDriver);
+        networkConnection = default(NetworkConnection);
+    }
     public void SendMessageToServer(string msg, TransportPipeline pipeline)
     {
         NetworkPipeline networkPipeline = reliableAndInOrderPipeline;
