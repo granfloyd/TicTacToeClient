@@ -15,9 +15,11 @@ public class NetworkClient : MonoBehaviour
     const ushort NetworkPort = 9001;
     const string IPAddress = "10.0.0.153";
     public Game gameRef;
+    public Other otherRef;
     void Start()
     {
         gameRef = GameObject.Find("Cube").GetComponent<Game>();
+        otherRef = GameObject.Find("Cube").GetComponent<Other>();
 
         networkDriver = NetworkDriver.Create();
         reliableAndInOrderPipeline = networkDriver.CreatePipeline(typeof(FragmentationPipelineStage), typeof(ReliableSequencedPipelineStage));
@@ -37,9 +39,25 @@ public class NetworkClient : MonoBehaviour
     void Update()
     {
         #region Check Input and Send Msg
+        //create account
+        if(otherRef.sendit)
+        {
+            SendMessageToServer("MAKE_ACCOUNT" + "," + otherRef.currentUsername + "," + otherRef.currentPassword);
+            otherRef.sendit = false;
+        }
+        //sigin in
+        if (otherRef.senditt)
+        {
+            SendMessageToServer("CREATE_ACCOUNT" + "," + otherRef.currentUsername + "," + otherRef.currentPassword);
+            otherRef.senditt = false;
+        }
 
-        if (Input.GetKeyDown(KeyCode.A))
-            SendMessageToServer("Hello server's world, sincerely your network client");
+        //if (Input.GetKeyDown(KeyCode.A))
+        //    SendMessageToServer("MAKE_ACCOUNT" + "," + "benis" + "," + "test");
+        //if (Input.GetKeyDown(KeyCode.B))
+        //    SendMessageToServer("MAKE_ACCOUNT" + "," + "benis2" + "," + "test2");
+        //if (Input.GetKeyDown(KeyCode.C))
+        //SendMessageToServer("MAKE_ACCOUNT" + "," + "benis3" + "," + "test3");
 
         #endregion
 
@@ -138,25 +156,47 @@ public class NetworkClient : MonoBehaviour
         {
             string doneMsg = "RESET_COMPLETE";
             gameRef.ResetGame();
-            SendMessageToServer(doneMsg);
+            SendMessageToServer(doneMsg, TransportPipeline.ReliableAndInOrder);
             
         }
     }
 
-
-    public void SendMessageToServer(string msg)
+    public void SendMessageToServer(string msg, TransportPipeline pipeline)
     {
+        NetworkPipeline networkPipeline = reliableAndInOrderPipeline;
+        if (pipeline == TransportPipeline.FireAndForget)
+            networkPipeline = nonReliableNotInOrderedPipeline;
+
         byte[] msgAsByteArray = Encoding.Unicode.GetBytes(msg);
         NativeArray<byte> buffer = new NativeArray<byte>(msgAsByteArray, Allocator.Persistent);
 
         DataStreamWriter streamWriter;
-        networkDriver.BeginSend(reliableAndInOrderPipeline, networkConnection, out streamWriter);
+        networkDriver.BeginSend(networkPipeline, networkConnection, out streamWriter);
         streamWriter.WriteInt(buffer.Length);
         streamWriter.WriteBytes(buffer);
         networkDriver.EndSend(streamWriter);
 
         buffer.Dispose();
     }
+    //public void SendMessageToServer(string msg, TransportPipeline pipeline)
+    //{
+    //    byte[] msgAsByteArray = Encoding.Unicode.GetBytes(msg);
+    //    NativeArray<byte> buffer = new NativeArray<byte>(msgAsByteArray, Allocator.Persistent);
+
+    //    DataStreamWriter streamWriter;
+    //    networkDriver.BeginSend(reliableAndInOrderPipeline, networkConnection, out streamWriter);
+    //    streamWriter.WriteInt(buffer.Length);
+    //    streamWriter.WriteBytes(buffer);
+    //    networkDriver.EndSend(streamWriter);
+
+    //    buffer.Dispose();
+    //}
 
 }
 
+public enum TransportPipeline
+{
+    NotIdentified,
+    ReliableAndInOrder,
+    FireAndForget
+}
