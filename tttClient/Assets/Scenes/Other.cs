@@ -5,10 +5,8 @@ using UnityEngine.UI;
 
 public class Other : MonoBehaviour
 {
-    public GameObject mainui;
-    public GameObject createaccount;
-    public GameObject gamecanvas;
-
+    public GameObject createUI;
+    public GameObject mainUI;
     public Button signin;
     public Button create;
 

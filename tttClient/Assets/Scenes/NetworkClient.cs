@@ -5,6 +5,7 @@ using Unity.Networking.Transport;
 using System.Text;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using System;
 
 public class NetworkClient : MonoBehaviour
 {
@@ -16,6 +17,7 @@ public class NetworkClient : MonoBehaviour
     const string IPAddress = "10.0.0.153";
     public Game gameRef;
     public Other otherRef;
+   
     void Start()
     {
         gameRef = GameObject.Find("Cube").GetComponent<Game>();
@@ -51,13 +53,12 @@ public class NetworkClient : MonoBehaviour
             SendMessageToServer("LOGIN_DATA" + "," + otherRef.currentUsername + "," + otherRef.currentPassword ,TransportPipeline.ReliableAndInOrder);
             otherRef.senditt = false;
         }
+        if(otherRef.displayusernametxt.text != "")
+        {
+            otherRef.createUI.SetActive(false);
+            otherRef.mainUI.SetActive(true);
+        }
 
-        //if (Input.GetKeyDown(KeyCode.A))
-        //    SendMessageToServer("MAKE_ACCOUNT" + "," + "benis" + "," + "test");
-        //if (Input.GetKeyDown(KeyCode.B))
-        //    SendMessageToServer("MAKE_ACCOUNT" + "," + "benis2" + "," + "test2");
-        //if (Input.GetKeyDown(KeyCode.C))
-        //SendMessageToServer("MAKE_ACCOUNT" + "," + "benis3" + "," + "test3");
 
         #endregion
 
@@ -201,6 +202,11 @@ public class NetworkClient : MonoBehaviour
         networkDriver.EndSend(streamWriter);
 
         buffer.Dispose();
+    }
+
+    internal void JoinRoom(string name)
+    {
+        throw new NotImplementedException();
     }
     //public void SendMessageToServer(string msg, TransportPipeline pipeline)
     //{
