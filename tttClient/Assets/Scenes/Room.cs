@@ -12,48 +12,64 @@ public class Room : MonoBehaviour
     public Button backButton;
     public Text currentRoomtxt;
     public string roomnametxt;
-    //const int MaxNumberOfClientConnections = 4;
-    public int NetworkPort;
 
     public NetworkClient networkClient;
 
     private List<string> roomNames = new List<string>();
+
+    public GameObject panelPrefab;
+ 
     // Start is called before the first frame update
     void Start()
     {
-        networkClient = GetComponent<NetworkClient>();
+        networkClient = GameObject.Find("important").GetComponent<NetworkClient>();
         // Add listeners to the buttons
-        createRoomButton.onClick.AddListener(() => CreateRoom(input.text, NetworkPort));
-        //backButton.onClick.AddListener();
+        createRoomButton.onClick.AddListener(CreateUIPanel);
+        backButton.onClick.AddListener(Exit);
     }
 
-    public void CreateOrJoinRoom(string name, int port)
+
+
+    public void CreateUIPanel()
     {
+        roomnametxt = currentRoomtxt.text;
+        Debug.Log("hello");
+        // Instantiate the panel from the prefab
+        GameObject panel = Instantiate(panelPrefab);
 
-        if (IsRoomExists(name))
-        {
-            JoinRoom(name);
-        }
-        else
-        {
-            Debug.Log("Error");
-        }
+        // Set the name of the panel
+        panel.name = "ROOM_" + roomnametxt;
+
+        // Make the panel a child of the canvas
+        panel.transform.SetParent(GameObject.Find("ROOM_" + roomnametxt).transform, false);
+
+        // Set the position of the panel
+        panel.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, 0);
+
+        // Create a new Text object
+        GameObject textObj = new GameObject("RoomNameText");
+        textObj.transform.SetParent(panel.transform, false);
+
+        // Add a Text component to the Text object
+        Text text = textObj.AddComponent<Text>();
+
+        // Set the text properties
+        text.text = roomnametxt;
+        text.color = Color.black;
+        text.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+
+        // Set the Text object's RectTransform properties
+        RectTransform rectTransform = text.GetComponent<RectTransform>();
+        rectTransform.sizeDelta = new Vector2(200, 50);
+        rectTransform.anchoredPosition = new Vector2(0, 0);
+        networkClient.SendMessageToServer("ROOM_" + "," + roomnametxt, TransportPipeline.ReliableAndInOrder);
     }
 
-    public void CreateRoom(string name, int port)
+    private void Exit()
     {
-        Debug.Log("Creating room: " + name + " with port: " + port);
-        roomNames.Add(name);
-    }
-    public bool IsRoomExists(string name)
-    {
-        return roomNames.Contains(name);
+        networkClient.SendMessageToServer("ROOM_EXIT" + roomnametxt, TransportPipeline.ReliableAndInOrder);
     }
 
-    public void JoinRoom(string name)
-    {
-
-    }
 }
 
 

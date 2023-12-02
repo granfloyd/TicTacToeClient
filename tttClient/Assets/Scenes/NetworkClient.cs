@@ -14,10 +14,11 @@ public class NetworkClient : MonoBehaviour
     NetworkPipeline reliableAndInOrderPipeline;
     NetworkPipeline nonReliableNotInOrderedPipeline;
     const ushort NetworkPort = 9001;
-    const string IPAddress = "10.0.0.153";
+    const string IPAddress = "192.168.2.23";//"10.0.0.153";
     public Game gameRef;
     public Other otherRef;
    
+    public GameObject gamePrefab;
     void Start()
     {
         gameRef = GameObject.Find("Cube").GetComponent<Game>();
@@ -133,9 +134,14 @@ public class NetworkClient : MonoBehaviour
         {
             string[] msgParts = msg.Split(',');
             otherRef.displayusernametxt.text = msgParts[1];
+            otherRef.createUI.SetActive(false);
+            otherRef.mainUI.SetActive(true);
             return;
         }
-
+        if (msg.StartsWith("CREATING_GAME"))
+        {
+            Instantiate(gamePrefab, transform.position, Quaternion.identity);
+        }
         // If the server sends a "MOVE" message, update the button text
         if (msg.StartsWith("MOVE"))
         {
