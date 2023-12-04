@@ -1,6 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor.XR;
+//using UnityEditor.XR;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -15,7 +15,7 @@ public class Room : MonoBehaviour
 
     public NetworkClient networkClient;
 
-    private List<string> roomNames = new List<string>();
+    //private List<string> roomNames = new List<string>();
 
     public GameObject panelPrefab;
  

@@ -138,6 +138,11 @@ public class NetworkClient : MonoBehaviour
             otherRef.mainUI.SetActive(true);
             return;
         }
+        if (msg.StartsWith("GIMME_YOUR_INFO"))
+        {
+            string infomsg = otherRef.displayusernametxt.text;
+            SendMessageToServer("GET_USERNAME," + infomsg, TransportPipeline.ReliableAndInOrder);
+        }
         if (msg.StartsWith("CREATING_GAME"))
         {
             Instantiate(gamePrefab, transform.position, Quaternion.identity);
