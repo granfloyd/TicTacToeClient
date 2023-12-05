@@ -6,6 +6,7 @@ using System.Text;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using System;
+using System.Numerics;
 
 public class NetworkClient : MonoBehaviour
 {
@@ -21,7 +22,10 @@ public class NetworkClient : MonoBehaviour
     public GameObject gamePrefab;
     void Start()
     {
-        gameRef = GameObject.Find("Cube").GetComponent<Game>();
+        GameObject game = GameObject.Find("gamestuff");
+        if (game != null)
+            gameRef = game.GetComponent<Game>();
+        //gameRef = GameObject.Find("gamestuff").GetComponent<Game>();
         otherRef = GameObject.Find("Cube").GetComponent<Other>();
 
         networkDriver = NetworkDriver.Create();
@@ -145,6 +149,7 @@ public class NetworkClient : MonoBehaviour
             Instantiate(gamePrefab, transform.position, Quaternion.identity);
             return;
         }
+
         if (msg.StartsWith("YOUR_TURN"))
         {
             gameRef.isMyTurn = true;
