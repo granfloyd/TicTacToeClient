@@ -14,7 +14,7 @@ public class NetworkClient : MonoBehaviour
     NetworkPipeline reliableAndInOrderPipeline;
     NetworkPipeline nonReliableNotInOrderedPipeline;
     const ushort NetworkPort = 9001;
-    const string IPAddress = "192.168.2.23";//"10.0.0.153";
+    const string IPAddress = "10.0.0.153";//"";
     public Game gameRef;
     public Other otherRef;
    
@@ -59,7 +59,7 @@ public class NetworkClient : MonoBehaviour
             otherRef.createUI.SetActive(false);
             otherRef.mainUI.SetActive(true);
         }
-
+        
 
         #endregion
 
@@ -124,11 +124,7 @@ public class NetworkClient : MonoBehaviour
     private void ProcessReceivedMsg(string msg)
     {
         Debug.Log("Msg received = " + msg);
-        if (msg.StartsWith("YOUR_TURN"))
-        {
-            gameRef.isMyTurn = true;
-            return;
-        }
+
         // If the server sends a "YOUR_TURN" message, it's this client's turn
         if (msg.StartsWith("LOGIN_SUCCESSFUL"))
         {
@@ -142,10 +138,18 @@ public class NetworkClient : MonoBehaviour
         {
             string infomsg = otherRef.displayusernametxt.text;
             SendMessageToServer("GET_USERNAME," + infomsg, TransportPipeline.ReliableAndInOrder);
+            return;
         }
         if (msg.StartsWith("CREATING_GAME"))
         {
             Instantiate(gamePrefab, transform.position, Quaternion.identity);
+            return;
+        }
+        if (msg.StartsWith("YOUR_TURN"))
+        {
+            gameRef.isMyTurn = true;
+            Debug.Log("SUP");
+            return;
         }
         // If the server sends a "MOVE" message, update the button text
         if (msg.StartsWith("MOVE"))
@@ -174,7 +178,7 @@ public class NetworkClient : MonoBehaviour
             string doneMsg = "RESET_COMPLETE";
             gameRef.ResetGame();
             SendMessageToServer(doneMsg, TransportPipeline.ReliableAndInOrder);
-            
+
         }
     }
     public void Connect()
@@ -219,19 +223,7 @@ public class NetworkClient : MonoBehaviour
     {
         throw new NotImplementedException();
     }
-    //public void SendMessageToServer(string msg, TransportPipeline pipeline)
-    //{
-    //    byte[] msgAsByteArray = Encoding.Unicode.GetBytes(msg);
-    //    NativeArray<byte> buffer = new NativeArray<byte>(msgAsByteArray, Allocator.Persistent);
 
-    //    DataStreamWriter streamWriter;
-    //    networkDriver.BeginSend(reliableAndInOrderPipeline, networkConnection, out streamWriter);
-    //    streamWriter.WriteInt(buffer.Length);
-    //    streamWriter.WriteBytes(buffer);
-    //    networkDriver.EndSend(streamWriter);
-
-    //    buffer.Dispose();
-    //}
 
 }
 

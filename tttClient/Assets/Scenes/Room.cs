@@ -33,7 +33,6 @@ public class Room : MonoBehaviour
     public void CreateUIPanel()
     {
         roomnametxt = currentRoomtxt.text;
-        Debug.Log("hello");
         // Instantiate the panel from the prefab
         GameObject panel = Instantiate(panelPrefab);
 
