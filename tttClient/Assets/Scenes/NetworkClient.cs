@@ -22,9 +22,6 @@ public class NetworkClient : MonoBehaviour
     public GameObject gamePrefab;
     void Start()
     {
-        GameObject game = GameObject.Find("gamestuff");
-        if (game != null)
-            gameRef = game.GetComponent<Game>();
         //gameRef = GameObject.Find("gamestuff").GetComponent<Game>();
         otherRef = GameObject.Find("Cube").GetComponent<Other>();
 
