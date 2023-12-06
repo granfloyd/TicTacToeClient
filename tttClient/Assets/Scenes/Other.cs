@@ -103,9 +103,8 @@ public class Other : MonoBehaviour
     {
         chattxt.text = currentinputtxt.text;
         Debug.Log("yup");
-        string chatmsg = "CHAT_MSG," + displayusernametxt.text + "," + ": " + chattxt.text;
+        string chatmsg = "CHAT_MSG," + displayusernametxt.text + "," + ": " + currentinputtxt.text;
         clientRef.SendMessageToServer(chatmsg, TransportPipeline.ReliableAndInOrder);
-        sendchat = false;
     }
 }
 

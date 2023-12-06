@@ -127,6 +127,7 @@ public class NetworkClient : MonoBehaviour
     {
         Debug.Log("Msg received = " + msg);
 
+        
         if (msg.StartsWith("CHAT_MSG"))
         {
             string[] msgParts = msg.Split(',');
