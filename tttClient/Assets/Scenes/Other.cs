@@ -1,10 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class Other : MonoBehaviour
 {
+
+    public NetworkClient clientRef;
     public GameObject createUI;
     public GameObject mainUI;
     public Button signin;
@@ -33,9 +36,18 @@ public class Other : MonoBehaviour
     public bool sendit = false;
     public bool senditt = false;
 
+    public InputField inputfieldchat;
+    public Button sendbutton;
+
+    public Text currentinputtxt;
+
+    public Text chattxt;
+
+    public bool sendchat = false;
     // Start is called before the first frame update
     void Start()
     {
+        clientRef = GameObject.Find("important").GetComponent<NetworkClient>();
         create.onClick.AddListener(CreateAccount);
         signin.onClick.AddListener(SiginAccount);
 
@@ -49,12 +61,14 @@ public class Other : MonoBehaviour
         threebutton.onClick.AddListener(() => AddThis2("3"));
 
         back.onClick.AddListener(DeleteThis);
+
+        sendbutton.onClick.AddListener(SendThis);
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+
     }
 
     void AddThis(string txt)
@@ -84,6 +98,14 @@ public class Other : MonoBehaviour
         currentUsername = createusernametxt.text;
         currentPassword = createpasswordtxt.text;
         senditt = true;
+    }
+    void SendThis()
+    {
+        chattxt.text = currentinputtxt.text;
+        Debug.Log("yup");
+        string chatmsg = "CHAT_MSG," + displayusernametxt.text + "," + ": " + chattxt.text;
+        clientRef.SendMessageToServer(chatmsg, TransportPipeline.ReliableAndInOrder);
+        sendchat = false;
     }
 }
 

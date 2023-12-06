@@ -8,6 +8,7 @@ using UnityEngine.SceneManagement;
 using System;
 
 
+
 public class NetworkClient : MonoBehaviour
 {
     NetworkDriver networkDriver;
@@ -24,7 +25,6 @@ public class NetworkClient : MonoBehaviour
     void Start()
     {
         otherRef = GameObject.Find("Cube").GetComponent<Other>();
-
 
         networkDriver = NetworkDriver.Create();
         reliableAndInOrderPipeline = networkDriver.CreatePipeline(typeof(FragmentationPipelineStage), typeof(ReliableSequencedPipelineStage));
@@ -127,6 +127,16 @@ public class NetworkClient : MonoBehaviour
     {
         Debug.Log("Msg received = " + msg);
 
+        if (msg.StartsWith("CHAT_MSG"))
+        {
+            string[] msgParts = msg.Split(',');
+            string chatusername;
+            string chattext;
+            chatusername = msgParts[1];
+            chattext = msgParts[2];
+            otherRef.chattxt.text = chatusername + chattext; 
+            return;
+        }
         // If the server sends a "YOUR_TURN" message, it's this client's turn
         if (msg.StartsWith("LOGIN_SUCCESSFUL"))
         {
@@ -146,8 +156,7 @@ public class NetworkClient : MonoBehaviour
         if (msg.StartsWith("CREATING_GAME"))
         {
             gameStuff = Instantiate(gamePrefab, transform.position, Quaternion.identity);
-            gameRef = gameStuff.GetComponentInChildren<Game>();
-            
+            gameRef = gameStuff.GetComponentInChildren<Game>();            
             return;
         }
 
