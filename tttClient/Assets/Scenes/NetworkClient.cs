@@ -20,10 +20,11 @@ public class NetworkClient : MonoBehaviour
     public Other otherRef;
    
     public GameObject gamePrefab;
+    public GameObject gameStuff;
     void Start()
     {
-        //gameRef = GameObject.Find("gamestuff").GetComponent<Game>();
         otherRef = GameObject.Find("Cube").GetComponent<Other>();
+
 
         networkDriver = NetworkDriver.Create();
         reliableAndInOrderPipeline = networkDriver.CreatePipeline(typeof(FragmentationPipelineStage), typeof(ReliableSequencedPipelineStage));
@@ -141,9 +142,12 @@ public class NetworkClient : MonoBehaviour
             SendMessageToServer("GET_USERNAME," + infomsg, TransportPipeline.ReliableAndInOrder);
             return;
         }
+
         if (msg.StartsWith("CREATING_GAME"))
         {
-            Instantiate(gamePrefab, transform.position, Quaternion.identity);
+            gameStuff = Instantiate(gamePrefab, transform.position, Quaternion.identity);
+            gameRef = gameStuff.GetComponentInChildren<Game>();
+            
             return;
         }
 
