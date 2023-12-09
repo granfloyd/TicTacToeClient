@@ -6,8 +6,7 @@ using System.Text;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using System;
-
-
+using JetBrains.Annotations;
 
 public class NetworkClient : MonoBehaviour
 {
@@ -26,12 +25,17 @@ public class NetworkClient : MonoBehaviour
     {
         otherRef = GameObject.Find("Cube").GetComponent<Other>();
 
-        networkDriver = NetworkDriver.Create();
-        reliableAndInOrderPipeline = networkDriver.CreatePipeline(typeof(FragmentationPipelineStage), typeof(ReliableSequencedPipelineStage));
-        nonReliableNotInOrderedPipeline = networkDriver.CreatePipeline(typeof(FragmentationPipelineStage));
-        networkConnection = default(NetworkConnection);
-        NetworkEndPoint endpoint = NetworkEndPoint.Parse(IPAddress, NetworkPort, NetworkFamily.Ipv4);
-        networkConnection = networkDriver.Connect(endpoint);
+        if (NetworkClientProcessing.GetNetworkedClient() == null)
+        {
+            DontDestroyOnLoad(this.gameObject);
+            NetworkClientProcessing.SetNetworkedClient(this);
+            Connect();
+        }
+        else
+        {
+            Debug.Log("Singleton-ish architecture violation detected, investigate where NetworkClient.cs Start() is being called.  Are you creating a second instance of the NetworkClient game object or has NetworkClient.cs been attached to more than one game object?");
+            Destroy(this.gameObject);
+        }
     }
 
     public void OnDestroy()
@@ -40,31 +44,40 @@ public class NetworkClient : MonoBehaviour
         networkConnection = default(NetworkConnection);
         networkDriver.Dispose();
     }
-
+    //makes tic tac toe
+    public void MakeGame()
+    {
+        gameStuff = Instantiate(gamePrefab, transform.position, Quaternion.identity);
+        gameRef = gameStuff.GetComponentInChildren<Game>();
+    }
+    public bool WhosTurn()
+    {
+        return gameRef.isMyTurn = true;
+    }
+    public void Restarted()
+    { 
+    }
+         
     void Update()
     {
-        #region Check Input and Send Msg
-        //create account
-        if(otherRef.sendit)
-        {
-            SendMessageToServer("MAKE_ACCOUNT" + "," + otherRef.currentUsername + "," + otherRef.currentPassword, TransportPipeline.ReliableAndInOrder);
-            otherRef.sendit = false;
-        }
+        ////create account
+        //if (otherRef.sendit)
+        //{
+        //    SendMessageToServer("MAKE_ACCOUNT" + "," + otherRef.currentUsername + "," + otherRef.currentPassword, TransportPipeline.ReliableAndInOrder);
+        //    otherRef.sendit = false;
+        //}
+
         //sigin in
-        if (otherRef.senditt)
-        {
-            SendMessageToServer("LOGIN_DATA" + "," + otherRef.currentUsername + "," + otherRef.currentPassword ,TransportPipeline.ReliableAndInOrder);
-            otherRef.senditt = false;
-        }
-        if(otherRef.displayusernametxt.text != "")
+        //if (otherRef.senditt)
+        //{
+        //    SendMessageToServer("LOGIN_DATA" + "," + otherRef.currentUsername + "," + otherRef.currentPassword, TransportPipeline.ReliableAndInOrder);
+        //    otherRef.senditt = false;
+        //}
+        if (otherRef.displayusernametxt.text != "")
         {
             otherRef.createUI.SetActive(false);
             otherRef.mainUI.SetActive(true);
         }
-        
-
-        #endregion
-
         networkDriver.ScheduleUpdate().Complete();
 
         #region Check for client to server connection
@@ -85,15 +98,16 @@ public class NetworkClient : MonoBehaviour
 
         while (PopNetworkEventAndCheckForData(out networkEventType, out streamReader, out pipelineUsedToSendEvent))
         {
+            TransportPipeline pipelineUsed = TransportPipeline.NotIdentified;
             if (pipelineUsedToSendEvent == reliableAndInOrderPipeline)
-                Debug.Log("Network event from: reliableAndInOrderPipeline");
+                pipelineUsed = TransportPipeline.ReliableAndInOrder;
             else if (pipelineUsedToSendEvent == nonReliableNotInOrderedPipeline)
-                Debug.Log("Network event from: nonReliableNotInOrderedPipeline");
+                pipelineUsed = TransportPipeline.FireAndForget;
 
             switch (networkEventType)
             {
                 case NetworkEvent.Type.Connect:
-                    Debug.Log("We are now connected to the server");
+                    NetworkClientProcessing.ConnectionEvent();
                     break;
                 case NetworkEvent.Type.Data:
                     int sizeOfDataBuffer = streamReader.ReadInt();
@@ -101,11 +115,11 @@ public class NetworkClient : MonoBehaviour
                     streamReader.ReadBytes(buffer);
                     byte[] byteBuffer = buffer.ToArray();
                     string msg = Encoding.Unicode.GetString(byteBuffer);
-                    ProcessReceivedMsg(msg);
+                    NetworkClientProcessing.ReceivedMessageFromServer(msg, pipelineUsed);
                     buffer.Dispose();
                     break;
                 case NetworkEvent.Type.Disconnect:
-                    Debug.Log("Client has disconnected from server");
+                    NetworkClientProcessing.DisconnectionEvent();
                     networkConnection = default(NetworkConnection);
                     break;
             }
@@ -113,7 +127,6 @@ public class NetworkClient : MonoBehaviour
 
         #endregion
     }
-
     private bool PopNetworkEventAndCheckForData(out NetworkEvent.Type networkEventType, out DataStreamReader streamReader, out NetworkPipeline pipelineUsedToSendEvent)
     {
         networkEventType = networkConnection.PopEvent(networkDriver, out streamReader, out pipelineUsedToSendEvent);
@@ -123,80 +136,8 @@ public class NetworkClient : MonoBehaviour
         return true;
     }
 
-    private void ProcessReceivedMsg(string msg)
-    {
-        Debug.Log("Msg received = " + msg);
-
-        
-        if (msg.StartsWith("CHAT_MSG"))
-        {
-            string[] msgParts = msg.Split(',');
-            string chatusername;
-            string chattext;
-            chatusername = msgParts[1];
-            chattext = msgParts[2];
-            otherRef.chattxt.text = chatusername + chattext; 
-            return;
-        }
-        // If the server sends a "YOUR_TURN" message, it's this client's turn
-        if (msg.StartsWith("LOGIN_SUCCESSFUL"))
-        {
-            string[] msgParts = msg.Split(',');
-            otherRef.displayusernametxt.text = msgParts[1];
-            otherRef.createUI.SetActive(false);
-            otherRef.mainUI.SetActive(true);
-            return;
-        }
-        if (msg.StartsWith("GIMME_YOUR_INFO"))
-        {
-            string infomsg = otherRef.displayusernametxt.text;
-            SendMessageToServer("GET_USERNAME," + infomsg, TransportPipeline.ReliableAndInOrder);
-            return;
-        }
-
-        if (msg.StartsWith("CREATING_GAME"))
-        {
-            gameStuff = Instantiate(gamePrefab, transform.position, Quaternion.identity);
-            gameRef = gameStuff.GetComponentInChildren<Game>();            
-            return;
-        }
-
-        if (msg.StartsWith("YOUR_TURN"))
-        {
-            gameRef.isMyTurn = true;
-            Debug.Log("SUP");
-            return;
-        }
-        // If the server sends a "MOVE" message, update the button text
-        if (msg.StartsWith("MOVE"))
-        {
-            string[] msgParts = msg.Split(',');
-            if (msgParts.Length < 3)
-            {
-                Debug.LogError("Invalid MOVE message: " + msg);
-                return;
-            }
-
-            string buttonName = msgParts[1];
-            string newText = msgParts[2];
-
-            Text buttonText = GameObject.Find(buttonName).GetComponent<Text>();
-            if (buttonText == null)
-            {
-                Debug.LogError("Text not found: " + buttonName);
-                return;
-            }
-
-            buttonText.text = newText;
-        }
-        if (msg.StartsWith("RESET"))
-        {
-            string doneMsg = "RESET_COMPLETE";
-            gameRef.ResetGame();
-            SendMessageToServer(doneMsg, TransportPipeline.ReliableAndInOrder);
-
-        }
-    }
+    
+    
     public void Connect()
     {
         networkDriver = NetworkDriver.Create();
@@ -217,6 +158,7 @@ public class NetworkClient : MonoBehaviour
         networkConnection.Disconnect(networkDriver);
         networkConnection = default(NetworkConnection);
     }
+
     public void SendMessageToServer(string msg, TransportPipeline pipeline)
     {
         NetworkPipeline networkPipeline = reliableAndInOrderPipeline;
@@ -234,13 +176,6 @@ public class NetworkClient : MonoBehaviour
 
         buffer.Dispose();
     }
-
-    internal void JoinRoom(string name)
-    {
-        throw new NotImplementedException();
-    }
-
-
 }
 
 public enum TransportPipeline
@@ -249,3 +184,79 @@ public enum TransportPipeline
     ReliableAndInOrder,
     FireAndForget
 }
+//private void ProcessReceivedMsg(string msg)
+//{
+//    Debug.Log("Msg received = " + msg);
+
+
+//    //if (msg.StartsWith("CHAT_MSG"))
+//    //{
+//    //    string[] msgParts = msg.Split(',');
+//    //    string chatusername;
+//    //    string chattext;
+//    //    chatusername = msgParts[1];
+//    //    chattext = msgParts[2];
+//    //    otherRef.chattxt.text = chatusername + chattext;
+//    //    return;
+//    //}
+//    // If the server sends a "YOUR_TURN" message, it's this client's turn
+//    //if (msg.StartsWith("LOGIN_SUCCESSFUL"))
+//    //{
+//    //    string[] msgParts = msg.Split(',');
+//    //    otherRef.displayusernametxt.text = msgParts[1];
+//    //    otherRef.createUI.SetActive(false);
+//    //    otherRef.mainUI.SetActive(true);
+//    //    return;
+//    //}
+
+//    ////i dont think i use this anymore didnt add
+//    //if (msg.StartsWith("GIMME_YOUR_INFO"))
+//    //{
+//    //    string infomsg = otherRef.displayusernametxt.text;
+//    //    SendMessageToServer("GET_USERNAME," + infomsg, TransportPipeline.ReliableAndInOrder);
+//    //    return;
+//    //}
+
+//    //if (msg.StartsWith("CREATING_GAME"))
+//    //{
+//    //    gameStuff = Instantiate(gamePrefab, transform.position, Quaternion.identity);
+//    //    gameRef = gameStuff.GetComponentInChildren<Game>();            
+//    //    return;
+//    //}
+
+//    //if (msg.StartsWith("YOUR_TURN"))
+//    //{
+//    //    gameRef.isMyTurn = true;
+//    //    Debug.Log("SUP");
+//    //    return;
+//    //}
+//    // If the server sends a "MOVE" message, update the button text
+//    //if (msg.StartsWith("MOVE"))
+//    //{
+//    //    string[] msgParts = msg.Split(',');
+//    //    if (msgParts.Length < 3)
+//    //    {
+//    //        Debug.LogError("Invalid MOVE message: " + msg);
+//    //        return;
+//    //    }
+
+//    //    string buttonName = msgParts[1];
+//    //    string newText = msgParts[2];
+
+//    //    Text buttonText = GameObject.Find(buttonName).GetComponent<Text>();
+//    //    if (buttonText == null)
+//    //    {
+//    //        Debug.LogError("Text not found: " + buttonName);
+//    //        return;
+//    //    }
+
+//    //    buttonText.text = newText;
+//    //}
+//    if (msg.StartsWith("RESET"))
+//    {
+//        string doneMsg = "RESET_COMPLETE";
+//        gameRef.ResetGame();
+//        SendMessageToServer(doneMsg, TransportPipeline.ReliableAndInOrder);
+
+//    }
+//}

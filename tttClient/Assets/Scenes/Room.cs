@@ -61,12 +61,12 @@ public class Room : MonoBehaviour
         RectTransform rectTransform = text.GetComponent<RectTransform>();
         rectTransform.sizeDelta = new Vector2(200, 50);
         rectTransform.anchoredPosition = new Vector2(0, 0);
-        networkClient.SendMessageToServer("ROOM_" + "," + roomnametxt, TransportPipeline.ReliableAndInOrder);
+        //networkClient.SendMessageToServer("ROOM_" + "," + roomnametxt, TransportPipeline.ReliableAndInOrder);
     }
 
     private void Exit()
     {
-        networkClient.SendMessageToServer("ROOM_EXIT" + roomnametxt, TransportPipeline.ReliableAndInOrder);
+        //networkClient.SendMessageToServer("ROOM_EXIT" + roomnametxt, TransportPipeline.ReliableAndInOrder);
     }
 
 }

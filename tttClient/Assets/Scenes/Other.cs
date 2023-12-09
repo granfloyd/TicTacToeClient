@@ -6,7 +6,6 @@ using UnityEngine.UI;
 
 public class Other : MonoBehaviour
 {
-
     public NetworkClient clientRef;
     public GameObject createUI;
     public GameObject mainUI;
@@ -102,9 +101,8 @@ public class Other : MonoBehaviour
     void SendThis()
     {
         chattxt.text = currentinputtxt.text;
-        Debug.Log("yup");
-        string chatmsg = "CHAT_MSG," + displayusernametxt.text + "," + ": " + currentinputtxt.text;
-        clientRef.SendMessageToServer(chatmsg, TransportPipeline.ReliableAndInOrder);
+        //string chatmsg = "CHAT_MSG," + displayusernametxt.text + "," + ": " + currentinputtxt.text;
+        //clientRef.SendMessageToServer(chatmsg, TransportPipeline.ReliableAndInOrder);
     }
 }
 

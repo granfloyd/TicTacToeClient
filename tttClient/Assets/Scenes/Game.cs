@@ -62,7 +62,7 @@ public class Game : MonoBehaviour
             return;
 
         string msg = $"MOVE,{txt.name}";
-        clientRef.SendMessageToServer(msg,TransportPipeline.ReliableAndInOrder);
+        clientRef.SendMessageToServer(ClientToServerSignifiers.DisplayMove + "," + msg, TransportPipeline.ReliableAndInOrder);
 
         // After making a move, it's no longer this client's turn
         isMyTurn = false;
@@ -70,8 +70,7 @@ public class Game : MonoBehaviour
         input += 1;
         if (input == 5)
         {
-            string loserMsg = "LOSER";
-            clientRef.SendMessageToServer(loserMsg, TransportPipeline.ReliableAndInOrder);
+            clientRef.SendMessageToServer("From Client To Server: " + ClientToServerSignifiers.Loser, TransportPipeline.ReliableAndInOrder);
             Debug.Log("Draw!");
 
             ResetGame();
@@ -138,8 +137,8 @@ public class Game : MonoBehaviour
         if(CheckWinCondition())
         {
             Debug.Log("Game Over! We have a winner!");
-            string winnerMsg = "WINNER";
-            clientRef.SendMessageToServer(winnerMsg, TransportPipeline.ReliableAndInOrder);
+
+            clientRef.SendMessageToServer("From Client To Server: " + ClientToServerSignifiers.Winner, TransportPipeline.ReliableAndInOrder);
 
             ResetGame();
         }
