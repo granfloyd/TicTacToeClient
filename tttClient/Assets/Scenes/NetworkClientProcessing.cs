@@ -67,11 +67,21 @@ static public class NetworkClientProcessing
         }
 
 
+        
+    }
+    static public void SendMessageToServer(string msg, TransportPipeline pipeline)
+    {
+        string[] csv = msg.Split(sep);
+        int signifier = int.Parse(csv[0]);
+        Other otherRef = GameObject.Find("Cube").GetComponent<Other>();
+        Room roomRef = GameObject.Find("MainUI").GetComponent<Room>();
+
+        //networkClient.SendMessageToServer(msg, pipeline);
         //CLIENT->TO->SERVER 
         if (signifier == ClientToServerSignifiers.ChatMSG)
         {
-            string chatmsg = ClientToServerSignifiers.ChatMSG + 
-                otherRef.displayusernametxt.text + sep + ": " + 
+            string chatmsg = ClientToServerSignifiers.ChatMSG +
+                otherRef.displayusernametxt.text + sep + ": " +
                 otherRef.currentinputtxt.text;
             SendMessageToServer(chatmsg, TransportPipeline.ReliableAndInOrder);
         }
@@ -90,7 +100,7 @@ static public class NetworkClientProcessing
         {
             if (otherRef.senditt)//if sign in is pressed 
             {
-                SendMessageToServer(ClientToServerSignifiers.LoginData + sep + 
+                SendMessageToServer(ClientToServerSignifiers.LoginData + sep +
                     otherRef.currentUsername + sep +
                     otherRef.currentPassword,
                     TransportPipeline.ReliableAndInOrder);
@@ -107,16 +117,12 @@ static public class NetworkClientProcessing
         }
         else if (signifier == ClientToServerSignifiers.Loser) //send username and password
         {
-            
+
         }
         else if (signifier == ClientToServerSignifiers.Winner) //send username and password
         {
 
         }
-    }
-    static public void SendMessageToServer(string msg, TransportPipeline pipeline)
-    {
-        networkClient.SendMessageToServer(msg, pipeline);
     }
 
     #endregion
