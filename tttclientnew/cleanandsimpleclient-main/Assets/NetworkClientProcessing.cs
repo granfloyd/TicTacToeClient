@@ -14,7 +14,11 @@ static public class NetworkClientProcessing
         int signifier = int.Parse(csv[0]);
 
         //SERVER->TO->CLIENT
-        if (signifier == ServerToClientSignifiers.ChatMSG)
+        if (signifier == ServerToClientSignifiers.Debug) //display server msgs
+        {
+            gameLogic.displayServerMsg.text = csv[1];
+        }
+        else if (signifier == ServerToClientSignifiers.ChatMSG)  //display chat msg to client  
         {
             string chatusername;
             string chattext;
@@ -22,11 +26,16 @@ static public class NetworkClientProcessing
             chattext = csv[2];
             gameLogic.chattxt.text = chatusername + chattext;
         }
+        else if (signifier == ServerToClientSignifiers.LoginData) //display logined user
+        {
+            gameLogic.displayusernametxt.text = csv[1];
+        }
+        
     }
 
     static public void SendMessageToServer(string msg, TransportPipeline pipeline)
     {
-        networkClient.SendMessageToServer(msg, pipeline);
+        networkClient.SendMessageToServer(msg, pipeline);        
     }
 
     #endregion
@@ -105,6 +114,7 @@ static public class ServerToClientSignifiers
     public const int RoomExit = 12;
     public const int Winner = 21;
     public const int Loser = 22;
+    public const int Debug = 69;
 }
 
 #endregion
