@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -29,8 +30,24 @@ static public class NetworkClientProcessing
         else if (signifier == ServerToClientSignifiers.LoginData) //display logined user
         {
             gameLogic.displayusernametxt.text = csv[1];
+            gameLogic.createAccountUI.SetActive(false);
+            gameLogic.roomUI.SetActive(true);
         }
-        
+        else if (signifier == ServerToClientSignifiers.CreateGame) //makes the game
+        {
+            //make sure this waiting ui is not on screen when game is loaded
+            GameObject needsToGo2 = GameObject.FindGameObjectWithTag("Waiting");
+            Destroy(needsToGo2);
+        }
+        else if (signifier == ServerToClientSignifiers.WhosTurn) //tells the user its there turn
+        {
+
+        }
+    }
+
+    private static void Destroy(GameObject needsToGo2)
+    {
+        throw new NotImplementedException();
     }
 
     static public void SendMessageToServer(string msg, TransportPipeline pipeline)
