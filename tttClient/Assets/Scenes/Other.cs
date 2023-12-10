@@ -103,6 +103,11 @@ public class Other : MonoBehaviour
         chattxt.text = currentinputtxt.text;
         //string chatmsg = "CHAT_MSG," + displayusernametxt.text + "," + ": " + currentinputtxt.text;
         //clientRef.SendMessageToServer(chatmsg, TransportPipeline.ReliableAndInOrder);
+        string chatmsg = ClientToServerSignifiers.ChatMSG.ToString() + ',' +
+                 displayusernametxt.text + ',' + ": " +
+                 currentinputtxt.text;
+        NetworkClientProcessing.SendMessageToServer(chatmsg, TransportPipeline.ReliableAndInOrder);
+        Debug.Log(chatmsg);
     }
 }
 
