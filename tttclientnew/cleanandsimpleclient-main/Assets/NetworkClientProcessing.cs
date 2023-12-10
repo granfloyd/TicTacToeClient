@@ -2,10 +2,13 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 static public class NetworkClientProcessing
 {
     const char sep = ',';
+    
+
     #region Send and Receive Data Functions
     static public void ReceivedMessageFromServer(string msg, TransportPipeline pipeline)
     {
@@ -35,20 +38,33 @@ static public class NetworkClientProcessing
         }
         else if (signifier == ServerToClientSignifiers.CreateGame) //makes the game
         {
-            //make sure this waiting ui is not on screen when game is loaded
-            GameObject needsToGo2 = GameObject.FindGameObjectWithTag("Waiting");
-            Destroy(needsToGo2);
+            gameLogic.roomUI.SetActive(false);
+            gameLogic.MakeGame();
+        }
+        else if (signifier == ServerToClientSignifiers.DisplayMove) //tells the user its there turn
+        {
+            if (csv.Length < 3)
+            {
+                Debug.LogError("something went wrong: " + msg);
+                return;
+            }
+            string buttonName = csv[1];
+            string newText = csv[2];
+
+            Text buttonText = GameObject.Find(buttonName).GetComponent<Text>();
+            if (buttonText == null)
+            {
+                Debug.LogError("Text not found: " + buttonName);
+                return;
+            }
+            buttonText.text = newText;
         }
         else if (signifier == ServerToClientSignifiers.WhosTurn) //tells the user its there turn
         {
-
+            gameLogic.WhosTurn();
         }
     }
 
-    private static void Destroy(GameObject needsToGo2)
-    {
-        throw new NotImplementedException();
-    }
 
     static public void SendMessageToServer(string msg, TransportPipeline pipeline)
     {
@@ -97,7 +113,6 @@ static public class NetworkClientProcessing
     {
         gameLogic = GameLogic;
     }
-
     #endregion
 
 }

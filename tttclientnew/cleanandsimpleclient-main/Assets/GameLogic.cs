@@ -41,6 +41,10 @@ public class GameLogic : MonoBehaviour
     public string roomnametxt;
 
     public GameObject panelPrefab;
+    public GameObject TicTacToePrefab;
+
+    public TicTacToe tttRef;
+    public GameObject gameStuff;
 
     void Start()
     {
@@ -53,7 +57,16 @@ public class GameLogic : MonoBehaviour
         createRoomButton.onClick.AddListener(CreateRoomUIPanel);
         backButton.onClick.AddListener(ExitRoom);
     }
-
+    public void MakeGame()
+    {
+        gameStuff = Instantiate(TicTacToePrefab);
+        tttRef = gameStuff.GetComponentInChildren<TicTacToe>();
+    }
+    public bool WhosTurn()
+    {
+        Debug.Log("Turning turn");
+        return tttRef.isMyTurn = true;
+    }
     void CreateAccount()
     {
         wantsToCreate = true;
@@ -110,12 +123,10 @@ public class GameLogic : MonoBehaviour
         string msg = ClientToServerSignifiers.RoomJoin.ToString() + sep +
                 roomnametxt;
         NetworkClientProcessing.SendMessageToServer(msg, TransportPipeline.ReliableAndInOrder);
-        //networkClient.SendMessageToServer("ROOM_" + "," + roomnametxt, TransportPipeline.ReliableAndInOrder);
     }
 
     private void ExitRoom()
     {
-
         GameObject needsToGo = GameObject.Find("ROOM_" + roomnametxt);
         Destroy(needsToGo);
 
@@ -125,7 +136,6 @@ public class GameLogic : MonoBehaviour
         string msg = ClientToServerSignifiers.RoomExit.ToString() + sep +
                 roomnametxt;
         NetworkClientProcessing.SendMessageToServer(msg, TransportPipeline.ReliableAndInOrder);
-        //networkClient.SendMessageToServer("ROOM_EXIT" + roomnametxt, TransportPipeline.ReliableAndInOrder);
     }
     void Update()
     {
