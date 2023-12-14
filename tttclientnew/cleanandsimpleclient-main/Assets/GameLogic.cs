@@ -43,6 +43,8 @@ public class GameLogic : MonoBehaviour
     public Button backButton;
     public Text currentRoomtxt;
     public string roomnametxt;
+    public Button roomBackButton;
+    public bool isInRoom = false;
 
     public GameObject panelPrefab;
     public GameObject TicTacToePrefab;
@@ -59,12 +61,25 @@ public class GameLogic : MonoBehaviour
         signin.onClick.AddListener(SiginAccount);
 
         createRoomButton.onClick.AddListener(CreateRoomUIPanel);
-        backButton.onClick.AddListener(ExitRoom);
+        backButton.onClick.AddListener(ExitRoom);//while in waiting
+        roomBackButton.GetComponent<Image>().color = Color.red;
+        roomBackButton.onClick.AddListener(ExitCurrentRoom);
     }
     public void MakeGame()
     {
-        gameStuff = Instantiate(TicTacToePrefab);
-        tttRef = gameStuff.GetComponentInChildren<TicTacToe>();
+        isInRoom = true;
+        roomBackButton.GetComponent<Image>().color = Color.green;
+        
+        GameObject[] games = GameObject.FindGameObjectsWithTag("Game");
+        if (games.Length == 0)
+        {
+            GameObject gameStuff = Instantiate(TicTacToePrefab);
+            tttRef = gameStuff.GetComponentInChildren<TicTacToe>();
+        }
+        else
+        {
+            Debug.Log("Fuckoff");
+        }
     }
     public bool WhosTurn()
     {
@@ -98,7 +113,7 @@ public class GameLogic : MonoBehaviour
         roomnametxt = currentRoomtxt.text;
         // Instantiate the panel from the prefab
         GameObject panel = Instantiate(panelPrefab);
-        //Instantiate(waitingUI);
+        GameObject waiting = Instantiate(waitingUI);
         // Set the name of the panel
         panel.name = "ROOM_" + roomnametxt;
 
@@ -131,7 +146,7 @@ public class GameLogic : MonoBehaviour
         NetworkClientProcessing.SendMessageToServer(msg, TransportPipeline.ReliableAndInOrder);
     }
 
-    private void ExitRoom()
+    private void ExitRoom()//while in waiting
     {
         GameObject needsToGo = GameObject.Find("ROOM_" + roomnametxt);
         Destroy(needsToGo);
@@ -139,9 +154,31 @@ public class GameLogic : MonoBehaviour
         GameObject needsToGo2 = GameObject.FindGameObjectWithTag("Waiting");
         Destroy(needsToGo2);
 
-        string msg = ClientToServerSignifiers.RoomExit.ToString() + sep +
-                roomnametxt;
+        string msg = ClientToServerSignifiers.RoomExit.ToString();
         NetworkClientProcessing.SendMessageToServer(msg, TransportPipeline.ReliableAndInOrder);
+    }
+
+    private void ExitCurrentRoom()
+    {
+        if (isInRoom)
+        {
+
+            roomUI.SetActive(true);
+            roomBackButton.GetComponent<Image>().color = Color.red;
+
+            GameObject needsToGo = GameObject.Find("ROOM_" + roomnametxt);
+            Destroy(needsToGo);
+
+            GameObject needsToGo2 = GameObject.FindGameObjectWithTag("Waiting");
+            Destroy(needsToGo2);
+
+            GameObject needsToGo3 = GameObject.FindGameObjectWithTag("Game");
+            Destroy(needsToGo3);
+
+            string msg = ClientToServerSignifiers.RoomExit.ToString();
+            NetworkClientProcessing.SendMessageToServer(msg, TransportPipeline.ReliableAndInOrder);
+        }
+
     }
     void Update()
     {
