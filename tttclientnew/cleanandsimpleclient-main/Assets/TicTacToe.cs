@@ -27,7 +27,7 @@ public class TicTacToe : MonoBehaviour
     public int input = 0;
     public bool isMyTurn = false;
     public bool isWinConditionMet = false;
-
+    private const char sep = ',';
     void Start()
     {
         //make sure waiting ui is not on screen when game is loaded
@@ -52,20 +52,21 @@ public class TicTacToe : MonoBehaviour
     
     public void AddInput(Text txt)
     {
+        string buttonPressed;
+        buttonPressed = txt.name;
+
         if (!isMyTurn)
             return;
         isMyTurn = false;
-        string msg = ClientToServerSignifiers.DisplayMove.ToString() + ',' +
-            txt.name;
-        NetworkClientProcessing.SendMessageToServer(msg, TransportPipeline.ReliableAndInOrder);
-        
+
+        //sends the name of pressed button ex: txtx1y1  
+        string sendButtonPress = ClientToServerSignifiers.SendMove.ToString() + sep + buttonPressed;    
+        NetworkClientProcessing.SendMessageToServer(sendButtonPress, TransportPipeline.ReliableAndInOrder);        
 
         input += 1;
         if (input == 5)
         {
-            string msgloser = ClientToServerSignifiers.Loser.ToString();
-            NetworkClientProcessing.SendMessageToServer(msgloser, TransportPipeline.ReliableAndInOrder);
-            ResetGame();
+            NetworkClientProcessing.SendMessageToServer(ClientToServerSignifiers.ClearBoard.ToString(), TransportPipeline.ReliableAndInOrder);
         }
     }
 
@@ -130,11 +131,7 @@ public class TicTacToe : MonoBehaviour
         if (CheckWinCondition())
         {
             Debug.Log("Game Over! We have a winner!");
-
-            string msgwinner = ClientToServerSignifiers.Winner.ToString();
-            NetworkClientProcessing.SendMessageToServer(msgwinner, TransportPipeline.ReliableAndInOrder);
-
-            ResetGame();
+            NetworkClientProcessing.SendMessageToServer(ClientToServerSignifiers.ClearBoard.ToString(), TransportPipeline.ReliableAndInOrder);
         }
     }
 }

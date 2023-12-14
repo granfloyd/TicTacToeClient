@@ -12,7 +12,6 @@ static public class NetworkClientProcessing
     private const string defaultUsername = "DefaultUser";
     private const string welcomeMsg = "Welcome ";
     private const string wrongLoginInfo = "Invalid username or password ";
-    const int wrongLoginInfoid = 4;
 
     #region Send and Receive Data Functions
     static public void ReceivedMessageFromServer(string msg, TransportPipeline pipeline)
@@ -35,7 +34,7 @@ static public class NetworkClientProcessing
         {
             gameLogic.displayServerMsg.text = wrongLoginInfo;
         }
-        else if (signifier == ServerToClientSignifiers.ChatMSG)  //display chat msg to client  
+        else if (signifier == ServerToClientSignifiers.GlobalChatMSG)  //display chat msg to client  
         {
             string chatusername;
             string chattext;
@@ -49,7 +48,6 @@ static public class NetworkClientProcessing
         }
         else if (signifier == ServerToClientSignifiers.LoginData) //display logined user
         {
-            
             gameLogic.displayusernametxt.text = gameLogic.currentUsername.text;
             gameLogic.displayServerMsg.text = welcomeMsg + gameLogic.currentUsername.text;
             gameLogic.createAccountUI.SetActive(false);
@@ -59,6 +57,12 @@ static public class NetworkClientProcessing
         {
             gameLogic.roomUI.SetActive(false);
             gameLogic.MakeGame();
+        }
+        else if (signifier == ServerToClientSignifiers.RoomSpectate) //makes the game
+        {
+            gameLogic.roomUI.SetActive(false);
+            //gameLogic.MakeGame();
+            Debug.Log("spectating");
         }
         else if (signifier == ServerToClientSignifiers.DisplayMove) //tells the user its there turn
         {
@@ -78,9 +82,13 @@ static public class NetworkClientProcessing
             }
             buttonText.text = newText;
         }
-        else if (signifier == ServerToClientSignifiers.WhosTurn) //tells the user its there turn
+        else if (signifier == ServerToClientSignifiers.CurrentTurn) //tells the user its there turn
         {
             gameLogic.WhosTurn();
+        }
+        else if (signifier == ServerToClientSignifiers.ClearedBoard) //tells the user its there turn
+        {
+            gameLogic.ResetThisGame();
         }
     }
 
@@ -139,39 +147,36 @@ static public class NetworkClientProcessing
 #region Protocol Signifiers
 static public class ClientToServerSignifiers
 {
-    public const int ChatMSG = 1;
-    public const int MakeAccount = 2;
-    public const int LoginData = 3;
-    public const int AccountExists = 31;
-    public const int AccountMade = 32;
-    public const int WrongPasswordOrUsername = 34;
-    public const int CreateGame = 4;
-    public const int WhosTurn = 5;
-    public const int DisplayMove = 6;
-    public const int Restart = 7;
-    public const int RoomJoin = 11;
-    public const int RoomExit = 12;
-    public const int Winner = 21;
-    public const int Loser = 22;
+    public const int ChatMSG = 10; //sends server chat msg 
+
+    public const int MakeAccount = 20;   //sends server client login data for new account
+    public const int LoginData = 21;     //sends server client login data only for made accounts
+
+    public const int SendMove = 30;      //send move to server
+    public const int ClearBoard = 31;        //new
+
+    public const int RoomJoin = 40;
+    public const int RoomSpectate = 41;
+    public const int RoomExit = 42;
+
 }
 
 static public class ServerToClientSignifiers
 {
-    public const int ChatMSG = 1;
-    public const int MakeAccount = 2;
-    public const int LoginData = 3;
-    public const int AccountExists = 31;
-    public const int AccountMade = 32;
-    public const int WrongPasswordOrUsername = 34;
-    public const int CreateGame = 4;
-    public const int WhosTurn = 5;
-    public const int DisplayMove = 6;
-    public const int Restart = 7;
-    public const int RoomJoin = 11;
-    public const int RoomExit = 12;
-    public const int Winner = 21;
-    public const int Loser = 22;
-    public const int Debug = 69;
+    public const int GlobalChatMSG = 10;
+
+    public const int LoginData = 20;
+    public const int AccountExists = 21;
+    public const int AccountMade = 22;
+    public const int WrongPasswordOrUsername = 23;
+
+    public const int CreateGame = 30;
+    public const int CurrentTurn = 31;
+    public const int DisplayMove = 32;
+    public const int ClearedBoard = 33;
+
+    public const int RoomSpectate = 40;
+
 }
 
 #endregion

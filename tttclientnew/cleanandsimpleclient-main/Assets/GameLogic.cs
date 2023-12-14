@@ -6,6 +6,8 @@ using System.Text;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.UI;
+using UnityEngine.Windows;
+
 public class GameLogic : MonoBehaviour
 {
     const char sep = ',';
@@ -69,6 +71,10 @@ public class GameLogic : MonoBehaviour
         Debug.Log("Turning turn");
         return tttRef.isMyTurn = true;
     }
+    public void ResetThisGame()
+    {
+        tttRef.ResetGame();
+    }
     void CreateAccount()
     {
         wantsToCreate = true;
@@ -83,9 +89,7 @@ public class GameLogic : MonoBehaviour
     {
         //1,username,chattxt
         chattxt.text = currentinputtxt.text;
-        string chatmsg = ClientToServerSignifiers.ChatMSG.ToString() + sep +
-                 displayusernametxt.text + sep + ": " +
-                 currentinputtxt.text;
+        string chatmsg = ClientToServerSignifiers.ChatMSG.ToString() + sep + displayusernametxt.text + sep + ": " + currentinputtxt.text;
         NetworkClientProcessing.SendMessageToServer(chatmsg, TransportPipeline.ReliableAndInOrder);
     }
 
@@ -94,7 +98,7 @@ public class GameLogic : MonoBehaviour
         roomnametxt = currentRoomtxt.text;
         // Instantiate the panel from the prefab
         GameObject panel = Instantiate(panelPrefab);
-        Instantiate(waitingUI);
+        //Instantiate(waitingUI);
         // Set the name of the panel
         panel.name = "ROOM_" + roomnametxt;
 
