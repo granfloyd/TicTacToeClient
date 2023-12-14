@@ -91,8 +91,6 @@ static public class NetworkClientProcessing
             gameLogic.ResetThisGame();
         }
     }
-
-
     static public void SendMessageToServer(string msg, TransportPipeline pipeline)
     {
         networkClient.SendMessageToServer(msg, pipeline);        
@@ -155,7 +153,7 @@ static public class ClientToServerSignifiers
     public const int SendMove = 30;      //send move to server
     public const int ClearBoard = 31;        //new
 
-    public const int RoomJoin = 40;
+    public const int RoomJoin = 40;    
     public const int RoomSpectate = 41;
     public const int RoomExit = 42;
 
