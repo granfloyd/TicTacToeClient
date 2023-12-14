@@ -24,6 +24,8 @@ public class GameLogic : MonoBehaviour
     public Text currentPassword;//whats being typed in inputfield
     public bool wantsToSignin = false;
     public bool wantsToCreate = false;
+    public const string sendingUsername = "";
+    public const string sendingPassword = "";
 
     //chat
     public Button sendbutton;
@@ -139,6 +141,7 @@ public class GameLogic : MonoBehaviour
     }
     void Update()
     {
+        
         //CLIENT->TO->SERVER
         if (wantsToCreate)
         {

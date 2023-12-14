@@ -7,7 +7,15 @@ using UnityEngine.UI;
 static public class NetworkClientProcessing
 {
     const char sep = ',';
-    
+    const string accountexitsmsg = "Account Exists";
+    const string accountmademsg = "Account Created";
+    private const string defaultUsername = "DefaultUser";
+    private const string welcomeMsg = "Welcome ";
+    private const string wrongLoginInfo = "Invalid username or password ";
+    const int accountExitsid = 1;
+    const int accountMadeid = 2;
+    const int welcomeMsgID = 3;
+    const int wrongLoginInfoid = 4;
 
     #region Send and Receive Data Functions
     static public void ReceivedMessageFromServer(string msg, TransportPipeline pipeline)
@@ -18,15 +26,62 @@ static public class NetworkClientProcessing
         int signifier = int.Parse(csv[0]);
 
         //SERVER->TO->CLIENT
-        if (signifier == ServerToClientSignifiers.Debug) //display server msgs
+        if (signifier == ServerToClientSignifiers.AccountExists) //display server msgs
         {
-            gameLogic.displayServerMsg.text = csv[1];
+            if (csv[1] == accountExitsid.ToString())//31,1
+            {
+                gameLogic.displayServerMsg.text = accountexitsmsg;
+            }
+            else
+            {
+                Debug.Log("Something went wrong");
+            }
+        }
+        else if (signifier == ServerToClientSignifiers.AccountMade) //display server msgs
+        {
+            if (csv[1] == accountMadeid.ToString())//32,2
+            {
+                gameLogic.displayServerMsg.text = accountmademsg;
+            }
+            else
+            {
+                Debug.Log("Something went wrong");
+            }
+
+        }
+        else if (signifier == ServerToClientSignifiers.WelcomeMSG) //display server msgs
+        {
+            if (csv[1] == welcomeMsgID.ToString())//32,3
+            {
+                gameLogic.displayServerMsg.text = welcomeMsg;
+            }
+            else
+            {
+                Debug.Log("Something went wrong");
+            }
+
+        }
+        else if (signifier == ServerToClientSignifiers.WrongPasswordOrUsername) //display server msgs
+        {
+            if (csv[1] == wrongLoginInfoid.ToString())//32,4
+            {
+                gameLogic.displayServerMsg.text = wrongLoginInfo;
+            }
+            else
+            {
+                Debug.Log("Something went wrong");
+            }
+
         }
         else if (signifier == ServerToClientSignifiers.ChatMSG)  //display chat msg to client  
         {
             string chatusername;
             string chattext;
             chatusername = csv[1];
+            if(chatusername == "")
+            {
+                chatusername = defaultUsername;
+            }
             chattext = csv[2];
             gameLogic.chattxt.text = chatusername + chattext;
         }
@@ -123,6 +178,10 @@ static public class ClientToServerSignifiers
     public const int ChatMSG = 1;
     public const int MakeAccount = 2;
     public const int LoginData = 3;
+    public const int AccountExists = 31;
+    public const int AccountMade = 32;
+    public const int WelcomeMSG = 33;
+    public const int WrongPasswordOrUsername = 34;
     public const int CreateGame = 4;
     public const int WhosTurn = 5;
     public const int DisplayMove = 6;
@@ -138,6 +197,10 @@ static public class ServerToClientSignifiers
     public const int ChatMSG = 1;
     public const int MakeAccount = 2;
     public const int LoginData = 3;
+    public const int AccountExists = 31;
+    public const int AccountMade = 32;
+    public const int WelcomeMSG = 33;
+    public const int WrongPasswordOrUsername = 34;
     public const int CreateGame = 4;
     public const int WhosTurn = 5;
     public const int DisplayMove = 6;
