@@ -61,7 +61,7 @@ static public class NetworkClientProcessing
         else if (signifier == ServerToClientSignifiers.RoomSpectate) //makes the game
         {
             gameLogic.roomUI.SetActive(false);
-            //gameLogic.MakeGame();
+            gameLogic.MakeGame();
             Debug.Log("spectating");
         }
         else if (signifier == ServerToClientSignifiers.DisplayMove) //tells the user its there turn
